@@ -1,0 +1,48 @@
+winc
+
+This is a port to OS/2 of a couple of programs that work with the WinCam
+digital camera. For those of you not familiar with this device, the WinCam
+is a serially connected digital camera - it can even be connected via a modem.
+See the StarDot Technologies website at http://www.wincam.com for more info
+on the camera itself.
+
+winc was originally written by Paul Fox (pgf@foxharp.boston.ma.us) to provide
+support for the WinCam in Linux.  This is a port of two of the three programs
+Paul did, along with the enabler library.  The 16 bit Windows software that
+ships with the WinCam also works well in WinOS/2, using the SIO comms drivers.
+
+What we have in this package is:
+
+winc.exe, which takes pictures from the command line and has, in Mr Fox's words
+"too many command line options". See the file winc.man for docs on this.
+
+wincd.exe, which will act as a picture-taking daemon, running in the backround.
+See the file wincd.man for details on this program. 
+
+Paul Fox's original README file is here too - and you should read it.
+
+The library and source, neatly bundled into  winc_src.zip. This was a 'hack and
+slash' port (oops), but most of the code is pretty much the way Paul left it -
+the biggest exceptions are the low-level serial comms handling, and the locking
+handling. 
+
+A Big Thank You is due to Paul Fox for this, and to the nice folks at StarDot
+for their help and asdsistance. I may do more with this code in the future - 
+right now I thought I should get what I've done out and available so folks
+could get started.
+
+The WinCam is a nice device - I use it for a Webcam with wincd and the OS/2
+port of the Independent JPEG Groups' cjpeg utility. I especially like the
+convenience and flexibility offered by the serial interface.
+
+What the OS/2 support for the WInCam is seriously lacking is a viewfinder
+application  - that will update a small greyscale image from the Wincam 
+in viewfinder mode for focusing and aiming.  This is on my 'To-Do' list -
+but the list is a mile and a half long!  Perhaps one of you will beat me 
+to it - now that Paul (andI) have done this much for you.  :)
+
+Happy WinCamming!
+
+-Derek
+
+derek@decker.net

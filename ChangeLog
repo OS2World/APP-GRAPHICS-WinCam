@@ -1,0 +1,252 @@
+
+Changes for winc-36:
+    961016
+	+ README: mention the mailing list.  subscribe at:
+	    pgf-winc-request@foxharp.boston.ma.us
+    960929
+	+ winc.c wincd.c xwinc.c: added missing break in getopt switch.
+
+Changes for winc-35:
+    960926
+	+ find.c: zero the cam struct after mallocing.  current symptom
+	  was an uninitialized "starfield" element that was causing
+	  core dumps.
+
+	+ wincd.c wincd.1: add -e and -E for controlling exposure.
+
+Changes for winc-34:
+    960910
+	+ wincd.c winc.1: apply gamma function, update man page.
+
+	+ vignette.c winc.c wincam.h:  implemented winc_gamma(), which
+	  applies a gamma function to the image.  the default gamma value
+	  is 100 (representing 1.0 in the actual equation).
+
+    960828
+	+ xwinc.1 winc.1: clarifications, syntax errors.
+
+	+ view.c: if avg becomes zero while auto-exposing, set to high
+	  default, since it might be zero due to not enough light.  this
+	  is probably only the case when the lens cap is on, but possibly
+	  at night?
+
+	+ winc.c: choose a goal when doing starfield shots.  let's call it
+	  50.  this keeps the winc.rc file from influencing the results.
+
+	+ winc.1: a few more comments about creating the starfield image.
+	  the home camera wanted -S 20, the office camera wanted -S 45.
+	  this is either a difference in cameras, or a difference in
+	  temperature -- the office camera is on top of a warm monitor,
+	  the one at home beside a cool wall.
+    
+Changes for winc-33:
+    960828
+	+ pnm.c image.c convert.c find.c private.h winc.c winc.1:  changes
+	  to support starfield reference images.
+
+	+ Makefile starfield.c: new file containing code for reading and using
+	  the starfield reference image.
+
+Changes for winc-32:
+    960826
+	+ wincd.c winc.c wincd.1 winc.1:  reset the mod time of the written
+	  image to be the time at which the image was snapped.
+
+	+ winc.c: added "-o filename" to replace stdout as image destination.
+
+    960823
+	+ winc.c: added -S, for saving starfield pbm file.  nothing uses
+	  this yet.
+
+	+ pnm.c pnm.h: added winc_pbm_output(), for mono bitmap output
+
+Changes for winc-31: (mostly camera id support -- for naming cameras)
+    960822
+	+ winc.c: usage message is now split in two -- it was way
+	  too long.
+
+	+ winc.c: added -s speed option for setting baud rate.
+
+	+ winc.1: rearranged options, added section on baud rate and
+	  timeouts.
+
+	+ grabber.sh: add disclaimer about how wincd/wincd_script do
+	  everything (?) this does, perhaps better.
+
+    960821
+	+ convert.c winc.1:  added WinCamColor variable for specifying
+	  default color balance.
+
+	+ winc.1 wincd.1 xwinc.1: documentation of -i ID option.
+
+    	+ winc.c: unlock camera before normal closing, to suppress
+	  superfluous (and time-consuming) flush.
+
+	+ config.c: add support $WinCamId as a prefix for other config
+	  variables.  i.e. if WinCamId is set to "kitchen", then when
+	  we are asked for to look up "WinCamDevice", we will check for
+	  "kitchenWinCamDevice" first.
+
+	+ mergeenv.c: added "safeputenv()", which mallocs before doing
+	  a putenv() on its args.
+
+	+ winc.c wincd.c xwinc.c: add support for "-i idstring", for
+	  setting the WinCamId variable.  this lets you use multiple
+	  cameras on the same system, all configured from the same
+	  config file.
+
+    	+ find.c: include string.h for strerror() decl.
+
+    	+ convert.c: log the color balance choices made.
+
+Changes for winc-30:  (mostly modem support, also wincd bugfix)
+    960821
+	+ find.c: if WinCamModemChat config variable is non-null, then
+	  the line is tested for a modem.  if one is found, the contents
+	  of that config variable are run via "sh -c", with the tty port
+	  as stdin and stdout.  the command is intended to be a chat
+	  program, which will negotiate with and dial the modem.
+
+	+ protocol.c, private.h: added winc_check_for_modem() routine,
+	  to distinguish modem ports from camera ports.
+
+	+ comms.c: open the tty O_NDELAY, to ensure it opens.
+
+	+ wincd.c:  change DEFAULT_MAXDIFF to just 1% (from 4%).  i
+	  mis-translated the old numbers when i converted the code to use
+	  percentages.  it _used_ to use just 10 out of 3072 (64x48)
+	  pixels, which is .0032, or .32%, not 3.2%.
+
+    960818
+	+ wincd_script: change from /bin/sh to /bin/bash.
+
+	+ winc.1 wincd.1: fix syntax error.
+
+Changes for winc-29:	(mostly implementation of color-balance controls)
+
+    960818
+    	+ winc.c winc.1: no more -m option.  -e or -E forces manual
+	  exposure, -b allows setting goal, which is passed as negative
+	  exposure setting to the snap routines.
+
+	+ image.c convert.c wincam.h view.c image.c:  exposure is passed as
+	  int not unsigned, so goal can come in as negative exposure value.
+
+	+ view.c: change default brightness to 50%.
+
+	+ wincd_script:  make it a little smarter about its args.
+
+	+ xwinc.c: brightness default now comes from config file.
+
+	+ rationalize different default brightness settings, add -b flag
+	  to winc.c for controlling brightness goal.
+
+    	+ color.c: the problem that green-level is "off by 59%" is
+	  now taken care of in here.  blue, red, and green fix values
+	  are now all based on 128 externally.
+
+	+ convert.c winc.c wincd.c wincam.c:  API change: added "image
+	  adjustment" struct to arg list, added "winc_image_adjustments()"
+	  routine to fill it in, based on user-provided color-balance string,
+	  and widen and vignette choices.
+
+	+ winc.c wincd.c winc.1 wincd.1:  added -l option, which lets
+	  one set lighting (color-balance) specifications.
+
+	+ winc.c: re-enabled the widen (-n) and vignette (-r) options.
+
+    960817
+    	+ convert.c: commentary about color balancing values.
+
+	+ wincd.c wincd.1: change -l SECS to -p SECS (for "poll") to
+	  free up -l for "lighting" control.
+
+Changes for winc-28:	(mostly cosmetic renaming/relayering)
+    960816
+	+ comms.c config.c convert.c diags.c find.c locks.c private.h
+	  protocol.c view.c vignette.c winc.1 wincam.h wincd.c xwinc.c:
+	  mostly cosmetic.  renamed some internal routines to show their
+	  groupings better, e.g. all comms.c functions, which are really
+	  the OS dependent part, are now prefixed comms_xxxx().  also,
+	  provided wrapper for write(), so that now all access to serial
+	  port is via comms.c.  a port of this code to some other OS
+	  should require very few changes outside of a new comms.c.
+	  also relabelled some of the TRACE controls to make them a
+	  little more predictable.  winc man page reflects this as well.
+
+	+ wincd_script: now reports pid of the wincd process.
+
+Changes for winc-27:
+
+    960816
+	+ wincd.c:  tweaked the locking in wincd so that child process
+	  won't use camera without a lock.
+
+	+ xwinc.1 xwinc.c:  add -l and 'l' and 'u' commands, to allow
+	  xwinc to take exclusive ownership of the camera.
+
+	+ locks.c:  make redundant lock or unlock calls benign
+
+    960815
+    	+ convert.c, wincd.c, wincam.h, wincd.1:  threshold and maxdiff
+	  values are now expressed as percentages, rather than absolute
+	  values.  warning: args to winc_image_compare() changed.
+
+	+ private.h:  added include of unistd.h to pick up usleep() decl.	
+
+Changes for winc-26:
+
+    960815 (mostly locking protocol, so multiple programs can be used at
+    		once.)
+	+ locks.c: new file, contains locking calls.
+    
+    	+ Makefile: added locks.c
+
+	+ README: minor changes
+
+	+ comms.c:  differentiate between timeouts and other errors from
+	  timed_read().  establish initial lock on camera.
+
+	+ xwinc.c, winc.c, wincd.c:  catch termination signals, and
+	  explicitly close the camera to clean up any outstanding commands
+	  in case we currently held the lock.
+
+	+ wincd.c: no longer switch baud rates while looping, since this
+	  interferes with multi-program use.  perhaps the baud rate switch
+	  isn't worth it?  we'll see.
+
+	+ wincam.h: added winc_lock/unlock calls.
+
+	+ private.h: locking support.
+
+	+ find.c: initialize lock system, and flush commands on close.
+
+	+ protocol.c: add winc_flush(), which writes no-op commands to
+	  the camera to finish off any partially written command, and
+	  reads a big buffer's worth of stuff, to get any partially read
+	  response.  also, try harder to recover from protocol errors
+	  by retrying commands.
+
+	+ winc.1, wincd.1, xwinc.1:  mention the inter-program locking.
+
+Changes for winc-25:
+
+    960813 (mostly Solaris portability)
+	+ finish initializing termios struct, set all c_cc[] entries
+	  correctly.  (comms.c)
+
+	+ don't treat failed baud-rate setting as fatal.  (comms.c)
+
+	+ re-establish alarm signal handler every time it's caught. 
+	  (comms.c)
+
+	+ clean up baud-rate hunting. (find.c)
+
+	+ look for X11 includes and libs in their Solaris nook.
+	  this clearly doesn't scale, but it works on linux, freebsd,
+	  and solaris, very simply.  (Makefile)
+
+	+ finish eradicating old "-s stopbits" arg.  extra stopbits are
+	  now only settable from the config file. (winc.c)
+
+	+ correctly declare extern tracechars[].  (trace.h)

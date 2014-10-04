@@ -1,0 +1,5 @@
+#winc.rc - parameters for wincam stuff
+WinCamDevice=COM6
+WinCamBaudRate=115200
+WinCamColor=halogen
+

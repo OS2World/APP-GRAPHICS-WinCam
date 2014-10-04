@@ -1,0 +1,240 @@
+
+
+
+WINCD(1)						 WINCD(1)
+
+
+NAME
+       wincd  -	 a  daemon  which gets images from the WinCam.One
+       camera.
+
+SYNOPSIS
+       wincd [-options]
+
+DESCRIPTION
+       wincd periodically gets and saves images from the  digital
+       camera known as the WinCam.  It is a 640x492 capable color
+       digital camera, interfaced to  a	 computer  via	a  serial
+       cable.	See  http://www.wincam.com  for	 more information
+       about this camera.
+
+       Images grabbed by wincd are dumped in PGM or PNM format to
+       a  specified  file.   An	 optional script may be specified
+       which will run after  the  image	 is  saved.   Optionally,
+       images may be saved only if they are determined to be dif-
+       ferent than previous images.  "Difference" in this case is
+       determined  by  comparing  reduced  versions  of	 the  two
+       images: if a 64x48 version of the image has fewer  than	M
+       pixes  which  differ  by more than R grey levels, then the
+       images are considered to be the "same".	(These limits are
+       settable with -r and -m.)
+
+       wincd  controls	image  exposure automatically, though the
+       WinCamBrightness configuration variable	can  be	 used  to
+       control	the  brightness	 goal.	(See the winc manual page
+       for information on configuration variables.)
+
+
+LOCKING
+       Under OS/2, wincd.exe locks the com port while in use.
+
+OPTIONS
+       -h     prints the usage message
+
+       -p pollseconds
+	      The  loop interval is the amount of time wincd will
+	      pause during iterations of the  image  poll/compare
+	      loop.   Default  is 10.  This is the interval wincd
+	      will pause after it does not take a picture.
+
+       -w waitseconds
+	      The wait interval is the amount of time wincd  will
+	      pause  when it does take a picture.  Default is 60.
+
+       -n nsave
+	      wincd will keep "small" versions of images that  it
+	      has  saved  in  memory,  and  compare freshly taken
+	      images to these.	If it determines that a new image
+	      is  a duplicate of one that has already been saved,
+	      it will not save the new one.  The -n option deter-
+	      mines the length of this history, which defaults to
+	      6.  If simple "take  a  picture  every  N	 seconds"
+	      behavior is desired, set nsave to 0 and use "-w N".
+	      If a comparison history is desired,  set	nsave  to
+	      the  length  of  the history.  Use -p to choose how
+	      often wincd will look for changed images, and -w to
+	      "rate-limit"  the frequency of real pictures taken.
+
+       -r threshold
+
+       -m maxdiff
+	      Successive images are compared (in  reduced,  64x48
+	      form)   until  an	 "interesting"	image  is  found.
+	      "Interesting" is defined	as  "different	than  the
+	      last",  and  that	 is  defined  as having more than
+	      MAXDIFF percent of the pixels differ  by	at  least
+	      THRESHOLD	 percent of the total grey levels.  MAXD-
+	      IFF is expressed as a percentage of image area, and
+	      THRESHOLD	 is  expressed as a percentage of maximum
+	      pixel value.  When the draft-quality  image  passes
+	      this  criterion,	then  a full-size image is taken.
+	      (So actually, the premise that comparisons are done
+	      on reduced versions of images is false -- actually,
+	      the reduced and fullsize images come from two sepa-
+	      rate exposures.)
+
+       -f filename
+	      Images  grabbed by wincd are saved in the specified
+	      filename.	 It is	recommended  that  this	 file  be
+	      given  the  suffix  ".ppm" or ".pgm", since this is
+	      the conventional suffix for images in  PNM  or  PGM
+	      format.	(PPM for color, PGM for greyscale) (These
+	      formats are specified as part of the widely  avail-
+	      able  PBMPLUS  or "netpbm" packages.)  
+
+             (OS/2 Note:  The Independent JPEG Group's JPEG Software 
+              v 6a is currently at:
+                ftp://hobbes.nmsu.edu/old/os2/graphics/jpeg6a_os2a.zip
+
+             The GBM Utils also deal with the PNM format - they can
+             currently be found at:
+	        ftp://hobbes.nmsu.edu/old/os2/graphics/gbm.zip
+
+             As the Hobbes archive is re-organizing as this is being 
+             written, expect this to change. )
+
+
+
+              The  filename  defaults  to    "wincd.pnm".     The  
+              modification  time  of the file  will be set to the 
+	      time at which the picture  was snapped, rather than 
+              being  set  by  the  system  to  the time  at which 
+              the last part  of the  file was written.  (The time 
+              difference can  be tens of seconds.)
+
+       -s scriptname
+	      After  an	 image is saved, the specified script (if
+	      any) will be run.	 It is handed the filename of the
+	      image  as	 its  only  argument.  
+
+       -c     Grabs color images.  This is the default action.
+
+       -g     Grabs  greyscale	images,	 instead of color images.
+	      Greyscale images are 8 bits deep,	 with  a  maximum
+	      grey  level of 255.  Color images are 24 bits deep,
+	      with 255 values for each of red, green,  and  blue.
+	      The  default  size  of  either  type  of	image  is
+	      640x492.
+
+       -l lighting
+	      Affect the color balance of  the	image.	 See  the
+	      COLOR  BALANCE  section of the winc manual page for
+	      more information.
+
+       -2     Normally images are captured in a single	scan:  in
+	      this  mode,  of  the  492 lines in a default image,
+	      only the even rows are "real":  the  odd	rows  are
+	      created  by duplicating the row above.  If the sub-
+	      ject matter is still enough, the -2 option  can  be
+	      used to force a second scan about 1/8th of a second
+	      later.  This will fill in the odd	 rows  with  real
+	      data, and yield a higher quality picture.
+
+       -z N   Sets  the	 image reduction factor to 1, 2, 4.  This
+	      might be done when the full imagesize or resolution
+	      is not wanted or needed.	The values 1, 2, 4, and 8
+	      represent linear scaling of both the horizontal and
+	      vertical	axes.  Thus "-z 4" gives an image that is
+	      160x123 rather than the default 640x492.	(So actu-
+	      ally,  the arguments should really be 1, 4, 16, and
+	      64.)
+
+       -e NN or -E NN
+	      Sets exposure in milliseconds(-e)	 or  microseconds
+	      (-E).   The  shortest  possible  exposure	 time  is
+	      1/100,000th of a second, the longest  is	a  little
+	      over  1.3 seconds.  If neither option is used, winc
+	      will try several exposures until an  average  pixel
+	      brightness  goal	is  reached, which is set via the
+	      WinCamBrightness variable.
+
+       -a     Sound an audible alarm when the picture is actually
+	      snapped.	The process of "finding" the camera, tak-
+	      ing the  picture,	 and  downloading  the	image  is
+	      fairly lengthy.  Hearing a small beep when the pic-
+	      ture has been taken can be helpful.
+
+       -i IDSTRING
+	      Specify the "name" of the camera to be used.   This
+	      name  will  affect  the  way in which configuration
+	      information will be looked up.  See the section  on
+	      MULIPLE  CAMERAS	on  the winc manual page for more
+	      information.
+
+       -t tracestring
+	      Turns on program tracing.	 See the winc manual page
+	      for more information.
+
+STARTUP
+       winc will load configuration  information  from	the  file
+       $ETC/winc.rc. $ETC, for  those of  you who don't  know, is
+       the  directory pointed  to by  the "SET ETC=" line in your
+       config.sys file. This  pathname can be overridden with the
+       $WINC_RC environment  variable.	See  the manual  page for 
+       the "winc" command for more details.
+
+COPYING and COPYRIGHT
+       This software is Copyright (C) 1996, by Paul G. Fox.  Spe-
+       cific  image  processing	 code  is  Copyright (C) 1996, by
+       StarDot Technologies.
+
+       This program is free software;  you  can	 redistribute  it
+       and/or modify it under the terms of the GNU General Public
+       License as published  by	 the  Free  Software  Foundation;
+       either  version	2 of the License, or (at your option) any
+       later version.
+
+       This program is distributed in the hope that  it	 will  be
+       useful, but WITHOUT ANY WARRANTY; without even the implied
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.	  See  the  GNU	 General  Public License for more
+       details.
+
+       You should have received a copy of the GNU General  Public
+       License along with this program; if not, write to the Free
+       Software Foundation, Inc., 675  Mass  Ave,  Cambridge,  MA
+       02139, USA.
+
+DEBTS
+       wincd was created with the help of proprietary information
+       belonging to StarDot Technologies, makers of  the  WinCam.
+       Contact them at help@wincam.com for information on obtain-
+       ing a copy of that information.
+
+AUTHORS
+       wincd and the winc library were created by  Paul	 G.  Fox,
+       pgf@foxharp.boston.ma.us.
+
+       Port to OS/2 by Derek J Decker, derek@decker.net
+
+BUGS
+       Oh well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								4
+
+
+

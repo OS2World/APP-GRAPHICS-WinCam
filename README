@@ -1,0 +1,68 @@
+
+winc
+----
+
+winc is a software package useful for getting images from a WinCam digital
+camera.  The Wincam.One is a slick little 640x480 color camera, connected
+to your computer with a serial port (it can even be modem-connected).  The
+price right now (August '96) is $200.  See the Stardot Technologies website
+at http://www.wincam.com for more information on the camera itself. 
+
+What you get with winc is:
+    - three programs (which i've used, as of winc-25, under Linux, FreeBSD,
+      and Solaris), namely:
+	- winc, which will take pictures from the command line --
+		it has too many options, and does too much.  i use
+		it during development of the winc library, so it can
+		do just about anything the library can.  usually, though,
+		all you want is "winc -c >image.pnm".
+	- wincd, which will repetitively take pictures, only saving
+		the ones that are "interesting".  i use this (in
+		combination with "wincd_script") to drive a web page of
+		recent pictures of my dog, waiting at home until i get
+		there.  no, i won't publish the URL.  :-)
+	- xwinc, a simple X11 program which continuously displays
+		low-resulotion "viewfinder" images.  this is useful for
+		aiming and focusing the camera.  it could (and probably
+		will be) easily extended to be a more general WinCam
+		application.
+    - a library: libwinc.a, which can be linked into other programs.
+    - some patches for the "xv" image manipulation tool, which give it
+	simple built-in wincam support.
+    - a shell script (wincd_script) which does periodic snapshots, and
+	    will optionally save past snaps.
+    - man pages
+
+
+StarDot Technologies, the makers of the WinCam, have supported this effort
+in a couple of ways.  First, they created a developer program, in which they
+make available some of their more private stuff to those simply willing to
+sign an NDA.  Kindly, their NDA explicitly permits the publication of
+source code based on a reading of that "private stuff".  Second, they
+provided me with the source code for their color processing module.  It was
+written originally in x86 assembly code -- to make it portable to UNIX, I
+rewrote it in C, and StarDot has blessed the publication of that
+translation under the GNU Public License.
+
+If you do use this code with the WinCam, i'd appreciate it if you'd drop
+the folks at StarDot a note to that effect -- they've been very nice to me,
+and answered a bunch of questions, and made this all possible -- and if
+it's helping them sell cameras, i'm sure they'd like to know that....  :-)
+It is especially generous of them to make their color processing code,
+which does moire pattern elimination on the image, available under the
+GPL.
+
+If you use winc, or fix it, or enhance it, or have something to contribute,
+please drop me a line!
+
+i've set up a mailing list for winc discussions.  subscribe by
+sending a message with the word "subscribe" in the subject or body
+to:
+	pgf-winc-request@foxharp.boston.ma.us
+
+once you're subscribed, the address for sending to the list itself is:
+
+	pgf-winc@foxharp.boston.ma.us
+
+paul fox
+pgf@foxharp.boston.ma.us

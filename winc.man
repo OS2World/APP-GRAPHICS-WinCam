@@ -1,0 +1,558 @@
+
+
+
+WINC(1)							  WINC(1)
+
+
+NAME
+       winc  -	command	 line interface to the WinCam.One digital
+       camera
+
+SYNOPSIS
+       winc [-options]
+
+DESCRIPTION
+       winc gives UNIX shell access to the digital  camera  known
+       as the WinCam.  It is a 640x480 capable color digital cam-
+       era, interfaced to a computer via  a  serial  cable.   See
+       http://www.wincam.com for more information about this cam-
+       era.
+
+       Images grabbed by winc are dumped in PGM or PNM format  to
+       the  standard  output, with the intention that they be run
+       through other tools to be converted to the desired format,
+       e.g.:
+
+       winc -g -2 | cjpeg >image.jpg
+
+       (The cjpeg command referred to is available as part of the
+       Independent JPEG Group's distribution  of  jpeg	software.
+       The PGM, PNM, and PBM formats are specified as part of the
+       widely available netpbm utilities.  Both of these packages
+       are  probably  available	 at  the same place you found the
+       winc code.)
+      
+       (OS/2 Note:  The Independent JPEG Group's JPEG Software v 6a 
+       is currently at: 
+           ftp://hobbes.nmsu.edu/old/os2/graphics/jpeg6a_os2a.zip
+
+       The GBM Utils also deal with the PNM format - they can 
+       currently be found at:
+	   ftp://hobbes.nmsu.edu/old/os2/graphics/gbm.zip
+
+       As the Hobbes archive is re-organizing as this is being written,
+       expect this to change. )
+	
+       Although this software processes the full 492 lines avail-
+       able  to	 the  camera,  there may be some residual effects
+       from the CCD (Charge Coupled Device) in the camera visible
+       in  the	first  and last few lines.  Hence the claimed 480
+       line resolution.
+
+OPTIONS
+       There are far too many  options	to  this  program,  as	a
+       result  of  its	being  a  development  tool  for the winc
+       library in addition to the basic	 image	capture	 command.
+       The  important  options	to  know about are -c (color), -g
+       (greyscale),  -2	 (double  scan),  -z   (zoom/scale),   -b
+       (brightness),  and  -l  (lighting).   The image will go to
+       stdout by default.  winc will  do  nothing  useful  except
+       find the camera (i.e. no image will be snapped) unless one
+       of -c, -g, or -v is present.
+
+       -h     prints the short usage message.
+
+       -H     prints the full usage message, since it's so  long.
+
+       -c     Grabs  a	color  image.	Color  images are 24 bits
+	      deep, with 255 values for each of red,  green,  and
+	      blue.   The  default size is 640x492.  Output is in
+	      PNM format.
+
+       -g     Grabs a greyscale image.	Greyscale  images  are	8
+	      bits  deep,  with a maximum grey level of 255.  The
+	      default size is 640 by 492.  Output is in PGM  for-
+	      mat.
+
+       -v     captures	a  "viewfinder" image.	Viewfinder images
+	      are 64 by 48 greyscale imagemaps, with grey  values
+	      in  the  range 0 to 15.  Because they are small and
+	      "shallow", they take much	 less  time  to	 download
+	      from the camera.	Output is in PGM format.
+
+       -2     Normally	images	are captured in a single scan: in
+	      this mode, of the 492 lines  in  a  default  image,
+	      only  the	 even  rows are "real";	 the odd rows are
+	      created by averaging between  the	 rows  above  and
+	      below.   If the subject matter is still enough, the
+	      -2 option can be used to force a second scan  about
+	      1/8th of a second later.	This will fill in the odd
+	      rows with real data.
+
+       -z N   Sets the viewfinder zoom factor to 1, 2, 4,  or  8,
+	      or  for  full images, sets the full image reduction
+	      factor.  Viewfinder images normally show	the  full
+	      field  of	 view at low resolution, but specifying a
+	      zoom of 8 will yield the camera's	 maximum  resolu-
+	      tion  in	a relatively small area.  This can assist
+	      in focusing the camera lens  (which  must	 be  done
+	      manually	--  loosen  the	 screw!).  Regular images
+	      cannot be zoomed, but can instead have their  reso-
+	      lution  and  overall dimension reduced.  This might
+	      be done when the full imagesize  or  resolution  is
+	      not  wanted  or  needed.	The full field of view is
+	      preserved.  The values 1, 2,  4,	and  8	represent
+	      linear  scaling of both the horizontal and vertical
+	      axes.  Thus "-z 2" gives an image that  is  160x123
+	      rather than the default 640x492.	(So actually, the
+	      arguments should really be 1, 4, 16, and 64.)
+
+       -l lighting
+	      Affect the color balance of the image.   See  COLOR
+	      BALANCE below.
+
+       -b NN  Sets  the	 "brightness" goal for the camera.  Expo-
+	      sure will be adjusted automatically in  an  attempt
+	      to  reach	 this  percentage  of  full  white.   The
+	      default value is 50 (percent).
+
+       -S NN  Saves a the threshold above which a pixel	 is  con-
+	      sidered  "bad".  See the section below on STARFIELD
+	      CORRECTION for more information.
+
+       -e NN or -E NN
+	      Sets exposure in milliseconds(-e)	 or  microseconds
+	      (-E).   The  shortest  possible  exposure	 time  is
+	      1/100,000th of a second, the longest  is	a  little
+	      over  1.3 seconds.  If neither option is used, winc
+	      will try several exposures until the average  pixel
+	      brightness goal is reached (see -b).
+
+       -a     Sound an audible alarm when the picture is actually
+	      snapped.	The process of "finding" the camera, tak-
+	      ing  the	picture,  and  downloading  the	 image is
+	      fairly lengthy.  Hearing a small beep when the pic-
+	      ture has been taken can be helpful.
+
+       -o FILE
+	      Normally	all  output  from winc will go to stdout.
+	      This will cause output to go to the specified file-
+	      name instead.  If -o is used, then the modification
+	      time of "filename" will be set to the time at which
+	      the  picture  was snapped, rather than being set by
+	      the system to the time at which the  last	 part  of
+	      the  file was written.  (The time difference can be
+	      tens of seconds.)
+
+       -i IDSTRING
+	      Specify the "name" of the camera to be used.   This
+	      name  will  affect  the  way in which configuration
+	      information will be looked up.  See the section  on
+	      MULIPLE CAMERAS, below.
+
+       -n     Leave  the image "narrow".  The natural image taken
+	      by the camera looks tall and thin if viewed unmodi-
+	      fied.  Normally a horizontal scaling is applied, to
+	      bring it up to 640 wide, which makes circles  round
+	      again.  Using -n suppresses this widening.  If this
+	      is  done,	 the  default  size  of	 images	 will  be
+	      512x492.
+
+       -r     Leave  a raw image, rather than one with brightened
+	      corners.	The camera leaves the corners quite  dark
+	      (half  as bright as the center), and winc will nor-
+	      mally brighten them.  Using -r suppresses this.
+
+       -G VAL Runs a gamma function on the  image,  which  is  an
+	      exponential curve that affects some areas more than
+	      others.  A value of 100 (or 0) will leave the image
+	      unchanged.   Values  less than 100 will tend to dim
+	      the image, values greater than  100  will	 tend  to
+	      brighten	it.   The  default  value  is  110, which
+	      lightens shadowy areas.  The default value  is  set
+	      with the WinCamGamma variable.
+
+       -d     Runs  camera diagnostics.	 If combined with -g, the
+	      camera will download as an image the  pattern  left
+	      in  memory as a result of the diagnostics, and this
+	      can be viewed as a test pattern.
+
+       -t tracestring
+	      Turns on program tracing.	 The argument is a string
+	      of  consisting of traceflags.  Primarily for debug-
+	      ging, this can be used to track down  configuration
+	      problems of various sorts.  The possible flags are:
+		   v just shows program and camera version information
+		   V will turn on all possible messages
+		   d for diagnostic tracing
+		   e to get exposure information
+		   a for simple API tracing
+		   A for full API tracing
+		   p for camera protocol
+		   P for _all_ bytes of protocol
+		   c for serial port control
+		   l for camera lock/unlock tracing
+		   g for graphics output routine tracing
+		   r for winc.rc configuration file tracing
+		   k for color processing tracing
+		   x for program-level tracing (i.e outside the library)
+
+       -f     The winc library supports a couple of ways of  tak-
+	      ing  pictures.   Normally,  picture  processing  is
+	      overlapped with the download of data from the  cam-
+	      era.   The -f option causes a different set of rou-
+	      tines to be used, which first  download,	and  then
+	      process the image.
+
+       -R     Data  retrieved  from the camera is dumped in Star-
+	      Dot's .wcd format to stdout.
+
+       -R -R  Data retrieved from the camera is	 dumped	 with  no
+	      processing or conversion to stdout.
+
+       -D     Raw  image  data	in  StarDot's .wcd format is read
+	      from stdin.  The data is always  considered  to  be
+	      double  scan,  so	 effectively  a	 '-2'  is forced.
+	      Fractional scans are not supported, so the -z  flag
+	      cannot be used.  The -g and -c flags are honored.
+
+       -D -D  This   will   cause  raw	camera	data  (presumably
+	      obtained with the "-R -R" option) to be  read  from
+	      stdin,  and processed as usual.  The -z, -c, and -g
+	      flags are still honored.
+
+COLOR BALANCE
+       Either the -l option or the WinCamColor	variable  can  be
+       used  to	 specify the lighting of the scene being snapped,
+       to affect the "color balance" of the  camera.   The  value
+       can  be	one  of	 several  predefined strings ("sunlight",
+       "flourescent", "tungsten" (or  the  synonymous  "incandes-
+       cent"),	"halogen", "studio", "filter", "defaults"), or it
+       can be a parenthesized triple of percentages by	which  to
+       adjust  the  red, green, and blue components of the image,
+       respectively.  Default values are obtained by omitting  -l
+       entirely,  or  using  "-l defaults" or "-l (100,100,100)".
+       (The parentheses will need to be quoted from the shell.)
+
+       Aliases for particular lighting needs can  be  set  up  by
+       defining environment or winc.rc (see CONFIGURATION, below)
+       variables  of  the  form	  "WinCamColor_ALIASNAME".    For
+       instance,       one	 might	     define	 "WinCam-
+       Color_backyard=(120,120,100)", and then refer to	 it  with
+       "-l  backyard".	Aliases can also refer to the compiled-in
+       values, e.g.  "WinCamColor_office=flourescent".
+
+STARFIELD CORRECTION
+       Like most CCD cameras, the WinCam will  have  some  pixels
+       that appear very bright when taking a picture in low light
+       conditions.  The effect when looking at a  dark	image  is
+       that it is speckled, or has a starry appearance.	 The good
+       news is that the "bad" CCD sensors are fixed for	 a  given
+       camera.	 By  saving  a	reference  image,  the "starfield
+       effect" can be eliminated from later pictures.
+
+       Use the -S option to create a reference image.	The  cam-
+       era's  lens  cap	 should	 be left on, so that it takes the
+       snap "in the dark".  The output is in the  PBM  monochrome
+       bitmap format.  The parameter to -S is the threshold above
+       which a pixel is considered "bad".  Values  of  20  to  50
+       seem  right,  apparently	 depending on the camera.  It may
+       also  depend  on	 the  temperature  of  the  camera.   The
+       starfield  image	 can  be viewed with a program like xv to
+       see if it seems to have too many or too	few  "bad"  spots
+       recorded.  Test the starfield image by using it to correct
+       another normal image, also taken with the lens cap left in
+       place.	The  resulting	image should be (almost) entirely
+       dark, or at least much better than a similar  image  taken
+       without starfield correction.
+
+       The  name  of  the file used for the reference is found in
+       the WinCamStarfield configuration variable.   The  easiest
+       way  to	test a new reference is to use a command like the
+       following:
+
+       WinCamStarfield=starfield.pbm  winc -c -ta | xv -
+
+       (assuming the reference	was  saved  in	"starfield.pbm").
+       When  satisfied	with  the  results, install the starfield
+       reference somewhere, and put its path in the winc.rc file.
+       Since  the reference image is camera-specific, if you have
+       more than one camera, be sure to use the camera's  identi-
+       fier  to qualify the WinCamStarfield variable.  See MULTI-
+       PLE CAMERAS, below.
+
+LOCKING
+       
+       In the current version of the OS/2 port, winc.exe locks 
+       the com port while in use, and reliquishes it when done.
+
+TIMEOUTS/BAUDRATE
+       The winc library normally chooses the highest baud rate at
+       which it can talk to the camera.	 This  is  usually  fine.
+       However,	 on  slower machines or substandard serial ports,
+       it may be that the camera can be "found", but  that  there
+       isn't  enough  throughput  to  reliably download an image.
+       ("Finding" a camera involves relatively	short  bursts  of
+       data  --	 downloading  an image requires much more.)  This
+       will be reflected by timeout  errors.	 A  16550  serial
+       port  chip  is  practically essential, as well as a (rela-
+       tively) fast cpu (a DX2/66 is plenty  fast  enough).   The
+       camera  supports	 no  flow-control whatever, so the system
+       must be able to accept almost 1600 characters in a row  at
+       full  speed  without  losing any.  If timeouts are experi-
+       enced (indicating dropped characters),  try  lowering  the
+       initial	baud  rate, with the WinCamBaudRate configuration
+       variable, or the -s SPEED option.  (The -s option is  only
+       available  for  winc.   The  wincd and xwinc programs must
+       have the baud rate set via the variable.
+
+MODEM OPERATION
+       A camera can be connected to a modem, and  can  be  called
+       using  a	 second	 modem on the local computer.  Aside from
+       the obvious physical connection differences, operation  is
+       almost  identical  to that of a directly connected camera.
+       The WinCamModemChat  variable  (see  CONFIGURATION  below)
+       should contain the full command line, including arguments,
+       for a command which will conduct	 a  scripted  negotiation
+       with the modem.	The suggested command for this purpose is
+       known as "chat".	 ("Chat" was originally written to estab-
+       lish  modem-based  PPP network connections, and is readily
+       available at many public ftp sites,  and	 is  included  as
+       standard	 in some Linux distributions.  Check the location
+       from which you retrieved the winc package -- there may  be
+       a  copy	of  chat  there.   See the chat man page for more
+       information on its usage.)
+
+CONFIGURATION
+       winc will load configuration  information  from	the  file
+       $ETC/winc.rc. $ETC, for  those of  you who don't  know, is 
+       the  directory pointed  to by  the "SET ETC=" line in your 
+       config.sys file. This  pathname can be overridden with the
+       $WINC_RC environment  variable.	Currently,  the following
+       options may be set in winc.rc.	Note that any of them may
+       be overridden by setting an environment	 variable of  the 
+       same name.  Numeric variables may be specified in decimal,
+       octal, or hex. Boolean on/off variables may be represented
+       as "on",  "off", "true", "false", "yes", "no", 1, or 0, or 
+       any appropriate substring.
+
+       The following describes the format of the winc.rc file:
+
+	      Lines whose first non-whitespace character  is  '#'
+	      are  skipped.   End-of-line  comments  are not sup-
+	      ported.
+
+	      Whitespace  surrounding  the  '='	 sign  itself  is
+	      removed,	as  is whitespace at the end of the line.
+	      Thus no values can ever begin or end in whitespace.
+
+	      No  other modifications are made to the value part;
+	      that is, no quoting mechanisms are supported.
+
+	      Line continuations are not supported.
+
+       The specific variables and their purpose are as follows:
+
+       WinCamDevice
+	      Specifies the tty device to  which  the  camera  is
+	      attached.	 Defaults to "COM2".
+
+       WinCamBaudRate
+	      Specifies	 the baud rate at which winc should start
+	      probing for the camera.  Successively  lower  rates
+	      will  be	attempted  until  the  camera  is  found.
+	      Defaults to 115200.
+
+       WinCamLockFile
+	      Not applicable to this OS/2 version.
+
+       WinCamStopBits
+	      The WinCam can be told to send extra "stop bits" on
+	      every character, thus  slowing  it's  transmissions
+	      fractionally.  Specifying more than 9 or 10 is bet-
+	      ter  accomplished	 by  lowering  the   baud   rate.
+	      Default is 0.
+
+       WinCamLineSync
+	      When  taking  pictures  indoors  under  flourescent
+	      lights, this will cause the camera  to  synchronize
+	      its exposure to the 60hz (50hz in some places) line
+	      frequency.  Default is on.
+
+       WinCamSensitivity
+	      A number from 0 to 15 which adjusts the sensitivity
+	      of the camera's internal A/D converter.  Default is
+	      15.
+
+       WinCamImageClick
+	      When the actual exposure command	is  sent  to  the
+	      camera, an audible beep is produced.
+
+       WinCamBrightness
+	      A	  number   between  1  and  99	representing  how
+	      "brightly" the image should be exposed.	Different
+	      scenes may need different values.	 The default, for
+	      reference, is 42.	 Values between	 40  and  60  are
+	      suggested.
+
+       WinCamColor
+	      The  default  color  balance  setting,  used in the
+	      absence of a -l option.  If this is  not	set,  the
+	      value used is "(100,100,100)".
+
+       WinCamGamma
+	      The  default  gamma correction value, normalized to
+	      100.   A	value  of  100	will  leave   the   image
+	      unchanged.   Bigger  numbers  brighten, and smaller
+	      numbers dim the image.  If  unset,  the  value  110
+	      will be used.
+
+       WinCamId
+	      In  the absence of a -i option or existing environ-
+	      ment variable, the WinCamId option  will	establish
+	      the  default  camera  name.   See MULTIPLE CAMERAS,
+	      below.
+
+MULTIPLE CAMERAS
+       If you have more than one WinCam, you will need to  attach
+       each  to a separate serial port.	 (Several WinCams techni-
+       cally have the capability to share a port, but  winc  does
+       not  support this feature.)  Each camera should be given a
+       name.  This name can be passed to winc on the command line
+       with  the  -i ID option.	 The configuration for individual
+       cameras is done exactly as  listed  in  the  CONFIGURATION
+       section	above,	except	that  the configuration variables
+       listed there will have the camera's name prefixed  to  it.
+       So, if you have a camera named "fishtank", and invoke winc
+       with the "-i fishtank" option, then the	device	to  which
+       that  camera  is	 attached should be defined in winc.rc as
+       "fishtankWinCamDevice = COM6", the	 brightness  set-
+       ting  will  be defined as "fishtankWinCamBrightness = 40",
+       etc.
+
+       The only variables which must be given independent  values
+       are  the name of the serial port (xxxWinCamDevice) and, if
+       more than one winc command may be active at a time for the
+       same  camera,  the  name	 of the lock file (xxxWinCamLock-
+       File).  If a camera-specific variable does not exist for a
+       given  setting, then the non-camera specific variable will
+       be looked up.  So if most cameras share a baud  rate  set-
+       ting,  then  that  would still be set as "WinCamBaudRate".
+       The -i option translates to  the	 value	of  the	 WinCamId
+       variable.
+
+EXAMPLE WINC.RC
+       Here is a sample winc configuration file, to show the fla-
+       vor of what one can  do.	  Using	 this  configuration  one
+       could  give commands to the "kitchen" camera without using
+       any -i option, and occasionally poll the camera	connected
+       to a remote modem by using "-i remote".
+
+       #defaults for all cameras
+       WinCamBaudRate = 115200
+       WinCamLineSync = off
+       WinCamBrightness = 45
+
+       # the default camera, if none is specified with "-i id" or in the environment
+       WinCamId = kitchen
+
+       # the modem-connected camera
+       remoteWinCamDevice = COM1
+       remoteWinCamBaudRate = 38400
+       remoteWinCamModemChat = chat '' ATZ OK ATDT5551212 CONNECTED
+       remoteWinCamColor = sunlight
+
+       # the kitchen camera
+       kitchenWinCamDevice = COM2
+       kitchenWinCamColor = flourescent
+       kitchenWinCamStarfield = c:\mptn\etc\winc_starfield_kitchen.pbm
+
+COPYING and COPYRIGHT
+       This software is Copyright (C) 1996, by Paul G. Fox.  Spe-
+       cific image processing code  is	Copyright  (C)	1996,  by
+       StarDot Technologies.
+
+       This  program  is  free	software; you can redistribute it
+       and/or modify it under the terms of the GNU General Public
+       License	as  published  by  the	Free Software Foundation;
+       either version 2 of the License, or (at your  option)  any
+       later version.
+
+       This  program  is  distributed in the hope that it will be
+       useful, but WITHOUT ANY WARRANTY; without even the implied
+       warranty	 of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
+       PURPOSE.	 See the GNU  General  Public  License	for  more
+       details.
+
+       You  should have received a copy of the GNU General Public
+       License along with this program; if not, write to the Free
+       Software	 Foundation,  Inc.,  675  Mass Ave, Cambridge, MA
+       02139, USA.
+
+DEBTS
+       winc was created with the help of proprietary  information
+       belonging  to  StarDot Technologies, makers of the WinCam.
+       Contact	them  at  help@wincam.com  for	 information   on
+       obtaining a copy of that information.
+
+AUTHORS
+       winc	 was	  created     by     Paul     G.     Fox,
+       pgf@foxharp.boston.ma.us.
+
+       OS/2 port by Derek J Decker, derek@decker.net
+
+BUGS
+       Oh well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+							       10
+
+
+
